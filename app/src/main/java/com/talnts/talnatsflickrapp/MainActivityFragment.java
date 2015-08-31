@@ -84,12 +84,10 @@ public class MainActivityFragment extends Fragment implements Observer<Object> {
                 Photo photo = null;
                 try {
                     photo = fetchImage(query);
+                    subscriber.onNext(photo);
                 } catch (Exception e) {
                     e.printStackTrace();
                     subscriber.onError(e);
-                }
-                if (photo != null) {
-                    subscriber.onNext(photo);
                 }
             }
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(this);
@@ -97,11 +95,8 @@ public class MainActivityFragment extends Fragment implements Observer<Object> {
 
 
     void updateImageView(Object o) {
-        Photo photo = (Photo) o;
         String url = ((Photo) o).getMediumUrl();
-        if (photo != null) {
-            imageLoader.displayImage(url, imageView);
-        }
+        imageLoader.displayImage(url, imageView);
     }
 
     Photo fetchImage(final String query) throws JSONException, FlickrException, IOException {
@@ -110,7 +105,6 @@ public class MainActivityFragment extends Fragment implements Observer<Object> {
         Flickr flickr = new Flickr(API_KEY, API_SEC);
         PhotoList photoList = null;
         photoList = flickr.getPhotosInterface().search(searchParameters, 1, 1);
-
         Photo photo = photoList.size() > 0 ? photoList.get(0) : null;
         return photo;
     }
